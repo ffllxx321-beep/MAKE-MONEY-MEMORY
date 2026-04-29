@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+  预览原型说明：
+  本文件仅用于浏览器查看 UI 流程（静态原型），不是 HarmonyOS 运行代码，
+  不参与 DevEco Studio / ArkTS / HAP 构建。
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>付款截图记账 - 静态预览原型</title>
+  <style>
+    :root { --bg:#f2f3f5; --card:#fff; --primary:#1677ff; --text:#222; --muted:#666; --danger:#c0392b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); }
+    .app { max-width: 420px; margin: 0 auto; min-height: 100vh; background: var(--bg); display:flex; flex-direction:column; }
+    .header { position: sticky; top:0; background:#fff; border-bottom:1px solid #eee; padding:12px 16px; font-weight:700; }
+    .content { flex:1; padding:16px; display:none; }
+    .content.active { display:block; }
+    .card { background:var(--card); border-radius:12px; padding:12px; margin-bottom:10px; }
+    .row { display:flex; align-items:center; gap:8px; }
+    .row-between { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .title { font-size:20px; margin:0 0 10px; }
+    .muted { color:var(--muted); font-size:12px; }
+    .bill { padding:10px; border-radius:10px; background:#fff; margin-bottom:8px; }
+    .btn { border:none; border-radius:10px; padding:10px 12px; cursor:pointer; background:#e9ecef; }
+    .btn.primary { background:var(--primary); color:#fff; }
+    .btn.danger { background:#ffeaea; color:var(--danger); }
+    input, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:10px; margin-bottom:8px; }
+    .tabs { position:sticky; bottom:0; background:#fff; border-top:1px solid #eee; display:grid; grid-template-columns:repeat(6,1fr); }
+    .tab { padding:10px 4px; border:none; background:#fff; font-size:12px; cursor:pointer; }
+    .tab.active { color:var(--primary); font-weight:700; }
+    .tag { display:inline-block; padding:3px 8px; border-radius:999px; font-size:12px; background:#f1f3f5; margin-right:6px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header" id="headerTitle">首页</div>
+
+    <section id="home" class="content active">
+      <h2 class="title">本月概览</h2>
+      <div class="grid2">
+        <div class="card"><div class="muted">本月支出</div><div style="font-size:24px;font-weight:700;">¥428.60</div></div>
+        <div class="card"><div class="muted">本月预算</div><div style="font-size:24px;font-weight:700;">¥3000.00</div></div>
+      </div>
+      <div class="card">
+        <div class="row-between"><strong>今日账单</strong><span class="muted">3 笔</span></div>
+        <div class="bill row-between"><span>午餐</span><strong>¥32.00</strong></div>
+        <div class="bill row-between"><span>打车</span><strong>¥18.50</strong></div>
+        <div class="bill row-between"><span>咖啡</span><strong>¥22.00</strong></div>
+      </div>
+      <button class="btn primary" onclick="go('quick')">记一笔</button>
+      <button class="btn" style="margin-left:8px" onclick="go('import')">导入付款截图</button>
+      <div class="card" style="margin-top:10px;">
+        <div class="muted">检测到新截图：wechat_pay_001.png，是否用于记账？</div>
+        <div style="margin-top:8px"><button class="btn primary" onclick="go('review')">记账</button></div>
+      </div>
+    </section>
+
+    <section id="quick" class="content">
+      <h2 class="title">手动记账</h2>
+      <input id="qAmount" placeholder="金额（必填）" value="" />
+      <select><option>支出</option><option>收入</option></select>
+      <select><option>餐饮</option><option>交通</option><option>购物</option><option>其它</option></select>
+      <select><option>现金</option><option>微信</option><option>支付宝</option><option>银行卡</option></select>
+      <input placeholder="备注（可选）" />
+      <input placeholder="时间，如 2026-04-29" value="2026-04-29" />
+      <div class="row"><button class="btn" onclick="go('home')">取消</button><button class="btn primary" onclick="mockSave('手动记账草稿已保存（mock）')">保存</button></div>
+      <div class="muted" id="quickMsg" style="margin-top:8px"></div>
+    </section>
+
+    <section id="import" class="content">
+      <h2 class="title">导入截图识别</h2>
+      <div class="card">
+        <div class="muted">这里只是浏览器 mock：不调用系统相册权限。</div>
+        <input type="file" accept="image/*" onchange="mockImport(event)" />
+        <div id="importInfo" class="muted">尚未选择图片</div>
+      </div>
+      <button class="btn primary" onclick="go('review')">进入识别确认（mock）</button>
+    </section>
+
+    <section id="review" class="content">
+      <h2 class="title">识别确认</h2>
+      <div class="card">
+        <div class="muted">OCR 状态：已完成（Mock OCR）</div>
+        <div style="margin-top:6px">候选：金额 26.80 / 商户 瑞幸咖啡 / 方式 微信支付</div>
+        <div class="muted">置信度 0.86（可编辑后保存）</div>
+      </div>
+      <input id="rAmount" value="26.80" />
+      <input id="rMerchant" value="瑞幸咖啡" />
+      <select><option>餐饮</option><option>交通</option><option>购物</option></select>
+      <select><option>微信</option><option>支付宝</option><option>银行卡</option></select>
+      <input value="2026-04-29 12:00" />
+      <input value="支付方式: 微信支付" />
+      <div class="card">
+        <span class="tag">候选金额 ¥26.80</span><span class="tag">候选金额 ¥28.00</span>
+      </div>
+      <div class="row"><button class="btn" onclick="go('home')">返回</button><button class="btn primary" onclick="mockSave('识别账单已保存（mock）')">保存</button></div>
+      <div class="muted" id="reviewMsg" style="margin-top:8px"></div>
+    </section>
+
+    <section id="list" class="content">
+      <h2 class="title">账单列表</h2>
+      <div class="bill row-between"><span>瑞幸咖啡</span><strong>¥26.80</strong></div>
+      <div class="bill row-between"><span>午餐</span><strong>¥32.00</strong></div>
+      <div class="bill row-between"><span>打车</span><strong>¥18.50</strong></div>
+    </section>
+
+    <section id="settings" class="content">
+      <h2 class="title">设置页</h2>
+      <div class="card row-between"><span>自动识别新截图</span><input type="checkbox" checked /></div>
+      <div class="card row-between"><span>付款后显示浮窗（App 内）</span><input type="checkbox" checked /></div>
+      <div class="card row-between"><span>识别后自动保存</span><input type="checkbox" /></div>
+      <div class="card">
+        <div class="muted">仅在这些 App 启用</div>
+        <div style="margin-top:6px">
+          <span class="tag">微信</span><span class="tag">支付宝</span><span class="tag">美团</span>
+        </div>
+      </div>
+      <div class="card">
+        <strong>隐私权限页（摘要）</strong>
+        <div class="muted" style="margin-top:6px">默认本地识别，不上传；能力不足时明确降级。</div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-target="home" onclick="go('home')">首页</button>
+      <button class="tab" data-target="quick" onclick="go('quick')">手动记账</button>
+      <button class="tab" data-target="import" onclick="go('import')">导入截图</button>
+      <button class="tab" data-target="review" onclick="go('review')">识别确认</button>
+      <button class="tab" data-target="list" onclick="go('list')">账单列表</button>
+      <button class="tab" data-target="settings" onclick="go('settings')">设置</button>
+    </nav>
+  </div>
+
+  <script>
+    const titles = { home:'首页', quick:'手动记账', import:'导入截图识别', review:'识别确认', list:'账单列表', settings:'设置页' }
+    function go(id){
+      document.querySelectorAll('.content').forEach(x=>x.classList.remove('active'))
+      document.getElementById(id).classList.add('active')
+      document.getElementById('headerTitle').textContent = titles[id] || '预览'
+      document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.target===id))
+    }
+    function mockImport(e){
+      const file = e.target.files && e.target.files[0]
+      document.getElementById('importInfo').textContent = file ? `已选择：${file.name}（仅预览，不会上传）` : '尚未选择图片'
+    }
+    function mockSave(msg){
+      const target = document.getElementById('quick').classList.contains('active') ? 'quickMsg' : 'reviewMsg'
+      document.getElementById(target).textContent = msg
+      setTimeout(()=>go('list'), 500)
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "dataset_name": "payment_screenshot_mock_v1",
+  "version": "1.0.0",
+  "samples": [
+    {
+      "id": "wechat_001",
+      "image": "test_assets/screenshots/wechat/wechat_001.png",
+      "mock_text": "微信支付\n商户: 瑞幸咖啡\n实付23.50\n时间 2026-04-29 09:20",
+      "expected": {
+        "amount": 23.5,
+        "merchant": "瑞幸咖啡",
+        "payment_method": "微信支付",
+        "category": "餐饮"
+      }
+    },
+    {
+      "id": "alipay_001",
+      "image": "test_assets/screenshots/alipay/alipay_001.png",
+      "mock_text": "支付宝\n收款方：盒马鲜生\n支付金额 88.00",
+      "expected": {
+        "amount": 88,
+        "merchant": "盒马鲜生",
+        "payment_method": "支付宝",
+        "category": "买菜"
+      }
+    },
+    {
+      "id": "meituan_001",
+      "image": "test_assets/screenshots/meituan/meituan_001.png",
+      "mock_text": "美团外卖\n店铺：小杨生煎\n已支付 34.2",
+      "expected": {
+        "amount": 34.2,
+        "merchant": "小杨生煎",
+        "payment_method": "",
+        "category": "其他"
+      }
+    },
+    {
+      "id": "jd_001",
+      "image": "test_assets/screenshots/jd/jd_001.png",
+      "mock_text": "京东\n商户：京东自营\n总计 129.00",
+      "expected": {
+        "amount": 129,
+        "merchant": "京东自营",
+        "payment_method": "",
+        "category": "购物"
+      }
+    },
+    {
+      "id": "bank_001",
+      "image": "test_assets/screenshots/bank/bank_001.png",
+      "mock_text": "银行卡\n商户：中石化\n付款金额 300.00",
+      "expected": {
+        "amount": 300,
+        "merchant": "中石化",
+        "payment_method": "银行卡",
+        "category": "其他"
+      }
+    }
+  ]
+}
